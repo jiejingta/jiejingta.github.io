@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- <script src="../tools/jquery-3.4.1.js"></script> -->
+    <title>动态时钟</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            background: gray;
+        }
+
+        .wrapper {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-top: -150px;
+            margin-left: -150px;
+            width: 300px;
+            height: 300px;
+            /* background: white; */
+        }
+
+        .horologe {
+            /* 没有指针的时钟图片 */
+            background: url(img/原子钟2.png);
+            background-size: 100%;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 圆心 */
+        .clock {
+            background: red;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* 刻度在没有背景图片时使用 */
+        .scale {
+            position: absolute;
+            background: red;
+            width: 5px;
+            height: 15px;
+            border-radius: 5px;
+        }
+
+        .shi {
+
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            background: rgb(28, 28, 29);
+            width: 6px;
+            height: 80px;
+            /* transform: rotate(0deg); */
+            transform-origin: 3px 70px;
+            border-radius: 5px;
+            position: absolute;
+            top: 80px;
+        }
+
+        .shi::before {
+            content: '';
+            display: block;
+            width: 5px;
+            height: 10px;
+            background: rgb(28, 28, 29);
+            transform: rotate(160deg);
+            position: relative;
+            top: -5px;
+            left: 3px;
+            border-radius: 50%;
+        }
+
+        .shi::after {
+            position: relative;
+            content: '';
+            display: block;
+            width: 5px;
+            height: 10px;
+            background: rgb(28, 28, 29);
+            transform: rotate(-160deg);
+            top: -5px;
+            left: -3px;
+            border-radius: 50%;
+        }
+
+        .fen {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            background: rgb(28, 28, 29);
+            width: 4px;
+            height: 115px;
+            /* transform: rotate(10deg); */
+            transform-origin: 2px 100px;
+            border-radius: 5px;
+            position: absolute;
+            top: 50px;
+        }
+
+        .miao {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            background: rgb(28, 28, 29);
+            width: 1px;
+            height: 150px;
+            /* transform: rotate(0deg); */
+            transform-origin: 0.5px 130px;
+            border-radius: 5px;
+            position: absolute;
+            top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="horologe">
+            <div class="clock"></div>
+            <div class="shi"></div>
+            <div class="fen"></div>
+            <div class="miao"></div>
+        </div>
+    </div>
+    <script>
+        var horologe = document.getElementsByClassName("horologe")[0];
+        // 时针
+        var shi = document.getElementsByClassName('shi')[0];
+        // 分针
+        var fen = document.getElementsByClassName('fen')[0];
+        // 秒针
+        var miao = document.getElementsByClassName('miao')[0];
+        createScale()
+        // 调用
+        setInitTime();
+        setInterval(function () {
+            var setDate = new Date();
+            var seconds = setDate.getSeconds();
+            var minutes = setDate.getMinutes();
+            var hours = setDate.getHours();
+            elapse(hours, minutes, seconds)
+        }, 1000);
+        function createScale() {
+            for (var i = 1; i <= 12; i++) {
+                var scale = document.createElement("div");
+                scale.setAttribute('class', "scale");
+                if (i == 12 || i == 3 || i == 6 || i == 9) {
+                    // 3、6、9、12的刻度宽一点
+                    scale.style.width = '10' + 'px';
+                }
+                scale.style.transform = "rotate(" + (30 * i) + "deg) translateY(-142px)";
+                //生成刻度
+                horologe.appendChild(scale)
+            }
+        }
+        // 初始时间
+        function setInitTime() {
+            // 获取当前时间
+            var date = new Date();
+            // 获取当前时
+            var hours = date.getHours();
+            // var hours = 12;
+            // 获取当前分
+            var minutes = date.getMinutes()
+            // var minutes = 10;
+            // 获取当前秒
+            var seconds = date.getSeconds();
+            // var seconds = 30;
+            elapse(hours, minutes, seconds)
+        }
+
+        //时间在流逝，不曾停歇
+        function elapse(hours, minutes, seconds) {
+            // 时针 一小时走30deg 一分钟走0.5deg 一秒走0.1/12 deg; 十分钟分钟5度  
+            // 分针 一小时走360deg 一分钟走6deg 一秒走 0.1deg 十分钟60度 速度是时针的12倍
+            // 秒针 一分钟走360deg 一分钟360deg 一秒走6deg 十分钟 3600deg 速度是分针的60倍 时针的720倍
+            shi.style.transform = "rotate(" + ((hours * 30) + ((minutes * 6) + seconds * (6 / 60)) / 12) + "deg)";
+            fen.style.transform = "rotate(" + ((minutes * 6) + seconds * (6 / 60)) + "deg)";
+            miao.style.transform = "rotate(" + (seconds * 6) + "deg)";
+        }
+    </script>
+</body>
+
+</html>
