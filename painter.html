@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, maximum-scale=1.0, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+	<title>在线涂鸦-支持数位板</title>
+
+	<script type="text/javascript" src="scripts/jquery.min.js"></script>
+	<script type="text/javascript" src="scripts/js.ext.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="docs/spectrum.css">
+    <script type="text/javascript" src="scripts/spectrum.js"></script>
+	<script type="text/javascript" src="engine/Module.js"></script>
+	<script async type="text/javascript" src="engine/WacomInkEngine.js"></script>
+
+	<script type="text/javascript" src="part2.js"></script>
+	<script type="text/javascript" src="spectrum.js"></script>
+
+	<style type="text/css">
+		body {position: relative; overflow: hidden; margin: 0; padding: 0; 
+            background-color: #66ccff; color: white;}
+        #spectrum {float:left; margin:5px;}
+        #will_canvas {margin: 0 auto; width: 100%; text-align: center;}
+        
+		canvas {border: 0px none; touch-action: none;}
+		h2, p {margin-left: 20px;}
+	</style>
+</head>
+<body>
+    <div class="container" id="spectrum">
+        <input type='text' id="full"/>
+    </div>
+    <div class="container" id="will_canvas">
+        <p>wacom数位板请在驱动程序中，勾选'启用windowsInk'</p>
+        <canvas id="canvas" oncontextmenu="WILL.clear(); event.preventDefault();"></canvas>
+    </div>
+    <script type="text/javascript" src="spectrum.js"></script>
+</body>
+</html>
