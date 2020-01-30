@@ -1,5 +1,5 @@
 $("#full").spectrum({
-    color: "#ECC",
+    color: "#66ccff",
     flat: true,
     showInput: true,
     className: "full-spectrum",
@@ -22,8 +22,22 @@ $("#full").spectrum({
     
     },
     change: function() {
-        
     },
     palette: [
     ]
 });
+
+   
+function SliderChange(){ 
+} 
+
+function spInputChange(){ 
+} 
+
+function InitPage(){
+    console.log("InitPage()")
+    var slider=document.getElementById("slider"); 
+    var sliderValue=document.getElementById("sliderValue"); 
+    sliderValue.value=slider.value; 
+}
+

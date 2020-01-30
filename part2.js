@@ -1,6 +1,7 @@
 var WILL = {
 	backgroundColor: Module.Color.WHITE,
 	color: Module.Color.from(204, 204, 204),
+    Minvalue: 1,
 
 	init: function(width, height) {
 		this.initInkEngine(width, height);
@@ -15,12 +16,12 @@ var WILL = {
 
 		this.speedPathBuilder = new Module.SpeedPathBuilder();
 		this.speedPathBuilder.setNormalizationConfig(182, 3547);
-		this.speedPathBuilder.setPropertyConfig(Module.PropertyName.Width, 2.05, 34.53, 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
+		this.speedPathBuilder.setPropertyConfig(Module.PropertyName.Width, 1, 10, 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
 
 		if (window.PointerEvent) {
 			this.pressurePathBuilder = new Module.PressurePathBuilder();
 			this.pressurePathBuilder.setNormalizationConfig(0.195, 0.88);
-			this.pressurePathBuilder.setPropertyConfig(Module.PropertyName.Width, 2.05, 34.53, 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
+			this.pressurePathBuilder.setPropertyConfig(Module.PropertyName.Width, 1, 10, 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
 		}
 
 		this.strokeRenderer = new Module.StrokeRenderer(this.canvas, this.canvas);
@@ -57,6 +58,21 @@ var WILL = {
 	},
 
 	beginStroke: function(e) {
+		// ????
+		var colorValue = document.getElementsByClassName('sp-input')[0].value;
+		// console.log('color', colorValue)
+		var drawColor = Module.Color.from(parseInt(colorValue.substr(1,2), 16), parseInt(colorValue.substr(3,2), 16), parseInt(colorValue.substr(5,2), 16))
+		// console.log(drawColor)
+		this.strokeRenderer.configure({brush: this.brush, color: drawColor});
+        // ??????
+        var slider=document.getElementById("slider");
+        var sliderValue=document.getElementById("sliderValue");
+        sliderValue.value=slider.value;
+		WILL.speedPathBuilder.setPropertyConfig(Module.PropertyName.Width, WILL.Minvalue, parseFloat(sliderValue.value), 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
+		WILL.pressurePathBuilder.setPropertyConfig(Module.PropertyName.Width, WILL.Minvalue, parseFloat(sliderValue.value), 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
+		
+		sliderValue.value=slider.value;
+		
 		if (["mousedown", "mouseup"].contains(e.type) && e.button != 0) return;
 		if (e.changedTouches) e = e.changedTouches[0];
 
@@ -111,11 +127,6 @@ var WILL = {
 	},
 
 	drawPath: function() {
-        var colorValue = document.getElementsByClassName('sp-input')[0].value;
-        // console.log('color', colorValue)
-        var drawColor = Module.Color.from(parseInt(colorValue.substr(1,2), 16), parseInt(colorValue.substr(3,2), 16), parseInt(colorValue.substr(5,2), 16))
-        // console.log(drawColor)
-		this.strokeRenderer.configure({brush: this.brush, color: drawColor});
 		this.strokeRenderer.draw(this.pathPart, this.inputPhase == Module.InputPhase.End);
 	},
 
