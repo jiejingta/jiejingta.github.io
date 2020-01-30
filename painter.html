@@ -21,8 +21,8 @@
             background-color: #66ccff; color: white;}
         #left_tool {float:left; margin:5px; width= 300px;}
         #will_canvas {margin: 0 auto; width: 100%; text-align: center;}
-        #slider {width: 100px}
-        #sliderValue {width: 30px}
+        #pxSlider,#transparencySlider {width: 100px}
+        #pxSliderValue,#transparencySliderValue {width: 30px}
         
 		canvas {border: 0px none; touch-action: none;}
 		h2, p {margin-left: 20px;}
@@ -31,10 +31,24 @@
 <body >
     <div class="container" id="left_tool">
         <div class="container" id="spectrum">
-            <input type='text' id="full"/>
+            <input type="text" id="full"/>
         </div>
-        大小<input type="range" id="slider" min="1" max="100" value="10" oninput="SliderChange()" />
-        <input id="sliderValue" value="10"/>
+        <p>
+            大小<input type="range" id="pxSlider" min="1" max="100" value="10" oninput="pxSliderChange()"/>
+            <input id="pxSliderValue" value="10"/>
+        </p>
+        <p>
+            透明度<input type="range" id="transparencySlider" min="0" max="100" value="100" oninput="transparencySliderChange()"/>
+            <input id="transparencySliderValue" value="1"/>
+        </p>
+        <p>
+            <label>当前使用：</label>
+            <label id="brushSelected" value="1">铅笔</label>
+            <br>
+            <button type='button' class="brush" id="brush01" value="1">铅笔</button>
+            <button type='button' class="brush" id="brush02" value="2">软铅笔</button>
+            <button type='button' class="brush" id="brush03" value="3">喷枪</button>
+        </p>
     </div>
     <div class="container" id="will_canvas">
         <p>wacom数位板请在驱动程序中，勾选'启用windowsInk'</p>

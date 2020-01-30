@@ -1,6 +1,8 @@
+
+
 var WILL = {
 	backgroundColor: Module.Color.WHITE,
-	color: Module.Color.from(204, 204, 204),
+	color: Module.Color.from(204, 204, 204, 0.5),
     Minvalue: 1,
 
 	init: function(width, height) {
@@ -53,26 +55,45 @@ var WILL = {
 		}
 	},
 
+    getBrush: function(idstr) {
+        var tempBrush = new Module.DirectBrush()
+        switch (idstr){
+            case "1":
+                tempBrush = new Module.DirectBrush();
+                break;
+            case "2":
+                tempBrush = new Module.SolidColorBrush();
+                break;
+            case "3":
+                tempBrush = new Module.ParticleBrush(false);
+                tempBrush.configure(true, {x: 0, y: 0}, 0.15, 0.05, Module.RotationMode.RANDOM);
+                tempBrush.configureShape("shape.png");
+                tempBrush.configureFill("fill.png");
+                break;
+        }
+        console.log(tempBrush);
+        return tempBrush;
+    },
+
 	getPressure: function(e) {
 		return (window.PointerEvent && e instanceof PointerEvent && e.pressure !== 0.5)?e.pressure:NaN;
 	},
 
 	beginStroke: function(e) {
-		// ????
+		// ????\???\??
+        var transparencySliderValue=document.getElementById("transparencySliderValue");
 		var colorValue = document.getElementsByClassName('sp-input')[0].value;
-		// console.log('color', colorValue)
-		var drawColor = Module.Color.from(parseInt(colorValue.substr(1,2), 16), parseInt(colorValue.substr(3,2), 16), parseInt(colorValue.substr(5,2), 16))
-		// console.log(drawColor)
-		this.strokeRenderer.configure({brush: this.brush, color: drawColor});
+        var brushID = $('#brushSelected').val();
+		var drawColor = Module.Color.from(parseInt(colorValue.substr(1,2), 16), parseInt(colorValue.substr(3,2), 16), parseInt(colorValue.substr(5,2), 16), transparencySliderValue.value)
+		this.strokeRenderer.configure({brush: this.getBrush(brushID), color: drawColor});
         // ??????
-        var slider=document.getElementById("slider");
-        var sliderValue=document.getElementById("sliderValue");
-        sliderValue.value=slider.value;
-		WILL.speedPathBuilder.setPropertyConfig(Module.PropertyName.Width, WILL.Minvalue, parseFloat(sliderValue.value), 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
-		WILL.pressurePathBuilder.setPropertyConfig(Module.PropertyName.Width, WILL.Minvalue, parseFloat(sliderValue.value), 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
-		
-		sliderValue.value=slider.value;
-		
+        var pxSliderValue=document.getElementById("pxSliderValue");
+		WILL.speedPathBuilder.setPropertyConfig(Module.PropertyName.Width, WILL.Minvalue, parseFloat(pxSliderValue.value), 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
+        WILL.speedPathBuilder.setPropertyConfig(Module.PropertyName.Alpha, 0.2, 0.3, NaN, NaN, Module.PropertyFunction.Power, 1, false);
+
+		WILL.pressurePathBuilder.setPropertyConfig(Module.PropertyName.Width, WILL.Minvalue, parseFloat(pxSliderValue.value), 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
+		WILL.pressurePathBuilder.setPropertyConfig(Module.PropertyName.Alpha, 0.2, 0.3, NaN, NaN, Module.PropertyFunction.Power, 1, false);
+
 		if (["mousedown", "mouseup"].contains(e.type) && e.button != 0) return;
 		if (e.changedTouches) e = e.changedTouches[0];
 
