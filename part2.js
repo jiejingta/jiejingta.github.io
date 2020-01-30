@@ -62,16 +62,13 @@ var WILL = {
                 tempBrush = new Module.DirectBrush();
                 break;
             case "2":
-                tempBrush = new Module.SolidColorBrush();
-                break;
-            case "3":
                 tempBrush = new Module.ParticleBrush(false);
                 tempBrush.configure(true, {x: 0, y: 0}, 0.15, 0.05, Module.RotationMode.RANDOM);
                 tempBrush.configureShape("shape.png");
                 tempBrush.configureFill("fill.png");
                 break;
         }
-        console.log(tempBrush);
+        console.log('return brush', tempBrush);
         return tempBrush;
     },
 
