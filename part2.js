@@ -12,7 +12,8 @@ var WILL = {
 
 	initInkEngine: function(width, height) {
 		this.canvas = new Module.InkCanvas(document.getElementById("canvas"), width, height);
-		this.canvas.clear(this.backgroundColor);
+		this.canvas.clear(Module.Color.RED);
+        this.strokesLayer = this.canvas.createLayer();
 
 		this.brush = new Module.DirectBrush();
 
@@ -25,8 +26,8 @@ var WILL = {
 			this.pressurePathBuilder.setNormalizationConfig(0.195, 0.88);
 			this.pressurePathBuilder.setPropertyConfig(Module.PropertyName.Width, 1, 10, 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
 		}
-
-		this.strokeRenderer = new Module.StrokeRenderer(this.canvas, this.canvas);
+        
+		this.strokeRenderer = new Module.StrokeRenderer(this.canvas);
 		this.strokeRenderer.configure({brush: this.brush, color: this.color});
 	},
 
@@ -67,6 +68,9 @@ var WILL = {
                 tempBrush.configureShape("shape.png");
                 tempBrush.configureFill("fill.png");
                 break;
+            case "3":
+                tempBrush = new Module.SolidColorBrush();
+                break;
         }
         console.log('return brush', tempBrush);
         return tempBrush;
@@ -91,13 +95,15 @@ var WILL = {
 		WILL.pressurePathBuilder.setPropertyConfig(Module.PropertyName.Width, WILL.Minvalue, parseFloat(pxSliderValue.value), 0.72, NaN, Module.PropertyFunction.Power, 1.19, false);
 		WILL.pressurePathBuilder.setPropertyConfig(Module.PropertyName.Alpha, 0.2, 0.3, NaN, NaN, Module.PropertyFunction.Power, 1, false);
 
+        
 		if (["mousedown", "mouseup"].contains(e.type) && e.button != 0) return;
 		if (e.changedTouches) e = e.changedTouches[0];
 
 		this.inputPhase = Module.InputPhase.Begin;
 		this.pressure = this.getPressure(e);
 		this.pathBuilder = isNaN(this.pressure)?this.speedPathBuilder:this.pressurePathBuilder;
-
+        // ????,?????,??????????
+        // this.smoothener = new Module.MultiChannelSmoothener(this.pathBuilder.stride);
 		this.buildPath({x: e.offsetX, y: e.offsetY});
 		this.drawPath();
 	},
@@ -135,20 +141,69 @@ var WILL = {
 		delete this.inputPhase;
 	},
 
-	buildPath: function(pos) {
+	// buildPath: function(pos) {
+		// var pathBuilderValue = isNaN(this.pressure)?Date.now() / 1000:this.pressure;
+
+		// var pathPart = this.pathBuilder.addPoint(this.inputPhase, pos, pathBuilderValue);
+		// var pathContext = this.pathBuilder.addPathPart(pathPart);
+
+		// this.pathPart = pathContext.getPathPart();
+	// },
+    
+    buildPath: function(pos) {
+        // ????,?????,??????????
+		// if (this.inputPhase == Module.InputPhase.Begin)
+			//this.smoothener.reset();
+
 		var pathBuilderValue = isNaN(this.pressure)?Date.now() / 1000:this.pressure;
 
 		var pathPart = this.pathBuilder.addPoint(this.inputPhase, pos, pathBuilderValue);
+        // ????,?????,??????????
+		// var smoothedPathPart = this.smoothener.smooth(pathPart, this.inputPhase == Module.InputPhase.End);
+		// var pathContext = this.pathBuilder.addPathPart(smoothedPathPart);
 		var pathContext = this.pathBuilder.addPathPart(pathPart);
 
 		this.pathPart = pathContext.getPathPart();
+
+		// if (this.inputPhase == Module.InputPhase.Move) {
+			// var preliminaryPathPart = this.pathBuilder.createPreliminaryPath();
+			// var preliminarySmoothedPathPart = this.smoothener.smooth(preliminaryPathPart, true);
+
+			// this.preliminaryPathPart = this.pathBuilder.finishPreliminaryPath(preliminarySmoothedPathPart);
+		// }
 	},
 
-	drawPath: function() {
-		this.strokeRenderer.draw(this.pathPart, this.inputPhase == Module.InputPhase.End);
+	// drawPath: function() {
+		// this.strokeRenderer.draw(this.pathPart, this.inputPhase == Module.InputPhase.End);
+	// },
+    
+    drawPath: function() {
+		if (this.inputPhase == Module.InputPhase.Begin) {
+			this.strokeRenderer.draw(this.pathPart, false);
+			this.strokeRenderer.blendUpdatedArea();
+		}
+		else if (this.inputPhase == Module.InputPhase.Move) {
+			this.strokeRenderer.draw(this.pathPart, false);
+			this.strokeRenderer.drawPreliminary(this.preliminaryPathPart);
+
+            //?clear??????,????????
+			this.canvas.clear(this.strokeRenderer.updatedArea, this.backgroundColor);
+			this.canvas.blend(this.strokesLayer, {rect: this.strokeRenderer.updatedArea});
+
+			this.strokeRenderer.blendUpdatedArea();
+		}
+		else if (this.inputPhase == Module.InputPhase.End) {
+			this.strokeRenderer.draw(this.pathPart, true);
+
+			this.strokeRenderer.blendStroke(this.strokesLayer, Module.BlendMode.NORMAL);
+
+			this.canvas.clear(this.strokeRenderer.strokeBounds, this.backgroundColor);
+			this.canvas.blend(this.strokesLayer, {rect: this.strokeRenderer.strokeBounds});
+		}
 	},
 
 	clear: function() {
+		this.strokesLayer.clear(this.backgroundColor);
 		this.canvas.clear(this.backgroundColor);
 	}
 };
